@@ -1,0 +1,259 @@
+.leaderboard-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #0d091a; 
+  background: radial-gradient(circle at top, #2a1f4c 0%, #0d091a 60%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.leaderboard-header {
+  display: flex;
+  align-items: center;
+  padding: 40px 20px 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.leaderboard-back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: absolute;
+  left: 20px;
+}
+
+.leaderboard-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  flex: 1;
+  text-align: center;
+}
+
+/* Podium Styles */
+.leaderboard-podium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 20px 10px 0;
+  margin-bottom: -10px; /* Overlap with list container */
+  position: relative;
+  z-index: 1;
+}
+
+.podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.podium-crown {
+  font-size: 24px;
+  margin-bottom: -5px;
+  z-index: 5;
+}
+
+.podium-avatar-wrapper {
+  position: relative;
+  margin-bottom: 8px;
+  border-radius: 50%;
+}
+
+.podium-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid transparent;
+}
+
+.avatar-large {
+  width: 90px;
+  height: 90px;
+}
+
+/* Glows and Borders */
+.gold-glow {
+  box-shadow: 0 0 20px rgba(255, 184, 0, 0.5);
+}
+.gold-glow .podium-avatar {
+  border-color: #ffb800;
+}
+
+.silver-glow {
+  box-shadow: 0 0 15px rgba(200, 210, 220, 0.3);
+}
+.silver-glow .podium-avatar {
+  border-color: #a4b4c4;
+}
+
+.bronze-glow {
+  box-shadow: 0 0 15px rgba(216, 115, 51, 0.3);
+}
+.bronze-glow .podium-avatar {
+  border-color: #d87333;
+}
+
+.podium-badge {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #000;
+  font-weight: 800;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.badge-gold { background: #ffb800; }
+.badge-silver { background: #e2e8f0; }
+.badge-bronze { background: #d87333; }
+
+.podium-name {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.podium-score {
+  color: #00ffcc;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Podium Blocks */
+.podium-block {
+  width: 100%;
+  background: rgba(60, 45, 130, 0.6);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255,255,255,0.4);
+  font-weight: 800;
+  font-size: 24px;
+  backdrop-filter: blur(10px);
+}
+.podium-block sup {
+  font-size: 14px;
+  margin-top: -10px;
+}
+
+.block-1 { height: 120px; background: rgba(74, 55, 153, 0.8); color: rgba(255,255,255,0.6); font-size: 36px; }
+.block-1 sup { font-size: 18px; margin-top: -15px; }
+.block-2 { height: 80px; }
+.block-3 { height: 60px; }
+
+/* List Section */
+.leaderboard-list-container {
+  background: #171128; 
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  flex: 1;
+  padding: 24px 16px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-list-container::-webkit-scrollbar {
+  display: none;
+}
+.leaderboard-list-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.leaderboard-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-list-item:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-list-item.is-you {
+  background: rgba(0, 255, 204, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 -16px; /* Bleed out to container edges for highlight */
+}
+
+.leaderboard-list-item.is-you .list-name {
+  font-weight: 800;
+}
+
+.leaderboard-list-item.is-you .list-avatar {
+  border: 2px solid #00ffcc;
+}
+
+.list-item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.list-rank {
+  color: #7b8a9d;
+  font-size: 16px;
+  font-weight: 600;
+  width: 20px;
+  text-align: center;
+}
+
+.list-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.list-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.list-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-trophy {
+  font-size: 14px;
+}
+
+.list-score {
+  color: #00ffcc;
+  font-size: 16px;
+  font-weight: 700;
+}

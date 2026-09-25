@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+:root {
+  /* Colors from Figma */
+  --primary: #b555ae;
+  --text-grey-01: #64748b;
+  --text-grey-02: #97a3b4;
+  --stroke-pills: #fdfdfd1a;
+  
+  /* Additional game theme colors based on the dark neon aesthetic */
+  --bg-dark: #0f0c29;
+  --bg-mid: #302b63;
+  --bg-light: #24243e;
+  
+  --accent-blue: #4facfe;
+  --accent-pink: #f093fb;
+  --neon-glow: rgba(181, 85, 174, 0.6);
+  --neon-blue-glow: rgba(79, 172, 254, 0.6);
+
+  --text-main: #ffffff;
+  
+  /* Typography */
+  --font-family: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-dark);
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-light) 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* For app-like feel */
+}
+
+#root {
+  width: 100%;
+  max-width: 414px; /* Mobile width */
+  height: 100vh;
+  max-height: 896px;
+  background-color: rgba(15, 12, 41, 0.8);
+  backdrop-filter: blur(10px);
+  position: relative;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px var(--neon-glow); }
+  50% { box-shadow: 0 0 25px var(--neon-glow); }
+  100% { box-shadow: 0 0 10px var(--neon-glow); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Utility classes */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--stroke-pills);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}

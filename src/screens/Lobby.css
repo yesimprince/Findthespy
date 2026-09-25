@@ -1,0 +1,140 @@
+.lobby-screen {
+  padding: 0;
+  background-color: #0f0c29;
+}
+
+.lobby-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  z-index: 10;
+  background: rgba(15, 12, 41, 0.4);
+}
+
+.lobby-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.lobby-title {
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #fff, #b555ae);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.player-count {
+  color: #4df79c;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  overflow-y: auto;
+  flex: 1;
+  padding-bottom: 20px;
+}
+
+.lobby-player-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+}
+
+.lobby-player-card img, .empty-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.lobby-player-card img {
+  border: 2px solid #b555ae;
+  box-shadow: 0 4px 12px rgba(181, 85, 174, 0.4);
+}
+
+.empty-avatar {
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: rgba(255,255,255,0.3);
+  border: 2px dashed rgba(255,255,255,0.2);
+}
+
+.lobby-player-card span {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.lobby-player-card.empty span {
+  color: rgba(255,255,255,0.4);
+}
+
+.lobby-footer {
+  margin-top: 10px;
+}
+
+.lobby-ctas {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cta-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.cta-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+.cta-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.start-game-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

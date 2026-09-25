@@ -1,0 +1,152 @@
+.how-to-play-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #070311;
+}
+
+.bg-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.4;
+}
+
+.bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 40px 24px 30px;
+}
+
+.screen-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.rules-scroll-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.rules-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+.rules-scroll-area {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.rule-card {
+  display: flex;
+  flex-direction: row;
+  background: rgba(18, 10, 30, 0.7);
+  border-radius: 16px;
+  padding: 20px;
+  gap: 16px;
+  backdrop-filter: blur(5px);
+}
+
+.rule-num {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.rule-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.rule-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #af2bec; /* Magenta purple matching screenshot */
+  margin-bottom: 4px;
+}
+
+.rule-desc {
+  font-size: 14px;
+  color: #e2e8f0;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.rule-ex {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.actions-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.btn-start {
+  width: 100%;
+  background: #8139df; /* Purple button */
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.btn-start:hover {
+  transform: translateY(-2px);
+  background: #9d5df0;
+}
+
+.btn-skip {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-style: italic;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.btn-skip:hover {
+  opacity: 1;
+}
