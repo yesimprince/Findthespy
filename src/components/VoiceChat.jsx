@@ -82,8 +82,16 @@ function MicController() {
   useEffect(() => {
     if (!localParticipant) return;
 
-    const handleToggle = () => {
-      localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+    const handleToggle = async () => {
+      try {
+        console.log('Toggling mic to:', !isMicrophoneEnabled);
+        await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+        // Force update if hook is slow
+        window.dispatchEvent(new CustomEvent('mic-state-changed', { detail: !isMicrophoneEnabled }));
+      } catch (err) {
+        console.error('Error toggling mic:', err);
+        alert('Could not toggle microphone. Check browser permissions.');
+      }
     };
 
     window.addEventListener('toggle-mic', handleToggle);
