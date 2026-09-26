@@ -231,6 +231,10 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('turn-ended');
   });
 
+  socket.on('live-transcript', ({ roomId, playerId, text }) => {
+    io.to(roomId).emit('player-transcript', { playerId, text });
+  });
+
   socket.on('disconnect', async () => {
     console.log('User disconnected:', socket.id);
     
