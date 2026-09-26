@@ -350,7 +350,7 @@ function App() {
       {lobbyInfo.roomId && !['SPLASH', 'MODE_SELECTION', 'JOIN_ROOM', 'HOW_TO_PLAY'].includes(gameState) && (
         <VoiceChat 
           roomId={lobbyInfo.roomId} 
-          participantName={players.find(p => p.id === 'human')?.name || 'Player'} 
+          participantName={myPlayerId || `Player-${Math.floor(Math.random()*1000)}`} 
         />
       )}
     </div>
