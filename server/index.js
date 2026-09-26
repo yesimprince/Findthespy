@@ -227,6 +227,10 @@ io.on('connection', (socket) => {
     io.to(data.roomId).emit('game-started', data);
   });
 
+  socket.on('end-turn', ({ roomId }) => {
+    io.to(roomId).emit('turn-ended');
+  });
+
   socket.on('disconnect', async () => {
     console.log('User disconnected:', socket.id);
     

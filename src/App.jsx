@@ -27,6 +27,7 @@ function App() {
   const [secretWord, setSecretWord] = useState('');
   const [usedWords, setUsedWords] = useState([]);
   const [spyId, setSpyId] = useState(null);
+  const [turnOrder, setTurnOrder] = useState([]);
   
   // State from child components
   const [cluesGiven, setCluesGiven] = useState([]); 
@@ -52,6 +53,7 @@ function App() {
       setUsedWords([data.word]);
       setSecretWord(data.word);
       setSpyId(data.spyId);
+      setTurnOrder(data.turnOrder || []);
       setCluesGiven([]);
       setVotes({});
       setRoundOutcome(null);
@@ -125,6 +127,10 @@ function App() {
     // Pick spy
     const newSpyId = currentPlayers[Math.floor(Math.random() * currentPlayers.length)].id;
     setSpyId(newSpyId);
+    
+    // Pick turn order
+    const order = shuffleArray(currentPlayers.map(p => p.id));
+    setTurnOrder(order);
     
     setCluesGiven([]);
     setVotes({});
@@ -243,11 +249,13 @@ function App() {
             const availableWords = Object.keys(WORD_MAP);
             const word = availableWords[Math.floor(Math.random() * availableWords.length)];
             const spy = players[Math.floor(Math.random() * players.length)].id;
+            const order = shuffleArray(players.map(p => p.id));
             
             socket.emit('start-game', { 
               roomId: lobbyInfo.roomId, 
               word: word, 
-              spyId: spy 
+              spyId: spy,
+              turnOrder: order
             });
           }}
           onBack={() => {
@@ -298,10 +306,12 @@ function App() {
           players={players}
           secretWord={secretWord}
           spyId={spyId}
+          turnOrder={turnOrder}
           roundNumber={currentRound}
           myPlayerId={myPlayerId}
-          onFinish={(clues) => {
-            setCluesGiven(clues);
+          socket={socket}
+          roomId={lobbyInfo.roomId}
+          onFinish={() => {
             setGameState('VOTING');
           }}
         />

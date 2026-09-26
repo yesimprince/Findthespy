@@ -1,86 +1,47 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ClueGiving.css';
 import bgImage from '../assets/how-to-play-bg.png';
-import { shuffleArray } from '../gameData';
 
-export default function ClueGiving({ players, secretWord, spyId, onFinish, roundNumber, myPlayerId }) {
+export default function ClueGiving({ players, turnOrder, secretWord, spyId, onFinish, roundNumber, myPlayerId, socket, roomId }) {
   const [timeLeft, setTimeLeft] = useState(90);
-  const [clues, setClues] = useState([]); 
-  const [turnOrder, setTurnOrder] = useState([]);
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0);
-  const [humanInput, setHumanInput] = useState('');
-  const [isListening, setIsListening] = useState(false);
-  
-  const cluesEndRef = useRef(null);
 
-  // Initialize turn order on mount
+  // Sync turns via socket
   useEffect(() => {
-    if (players && players.length > 0) {
-      const order = shuffleArray(players.map(p => p.id));
-      setTurnOrder(order);
-    }
-  }, [players]);
+    if (!socket) return;
+    
+    const handleTurnEnded = () => {
+      setCurrentTurnIndex(prev => prev + 1);
+    };
+
+    socket.on('turn-ended', handleTurnEnded);
+
+    return () => {
+      socket.off('turn-ended', handleTurnEnded);
+    };
+  }, [socket]);
 
   // Main Timer
   useEffect(() => {
-    if (turnOrder.length === 0) return; // Prevent instant skip on initial render
+    if (turnOrder.length === 0) return;
 
     if (timeLeft > 0 && currentTurnIndex < turnOrder.length) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 || currentTurnIndex >= turnOrder.length) {
-      // Wait 2.5 seconds after the last clue is given so the player has time to read it
-      const finishTimer = setTimeout(() => onFinish(clues), 2500);
+      // Wait a moment then finish
+      const finishTimer = setTimeout(() => onFinish(), 2500);
       return () => clearTimeout(finishTimer);
     }
-  }, [timeLeft, currentTurnIndex, turnOrder, onFinish, clues]);
+  }, [timeLeft, currentTurnIndex, turnOrder, onFinish]);
 
-
-  useEffect(() => {
-    cluesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [clues]);
-
-  const handleHumanSubmit = (e) => {
-    e.preventDefault();
-    if (!humanInput.trim()) return;
-    
-    if (humanInput.toLowerCase().includes(secretWord.toLowerCase())) {
-      alert("You can't use the secret word as a clue!");
-      return;
+  const handleEndTurn = () => {
+    if (socket && roomId) {
+      socket.emit('end-turn', { roomId });
+    } else {
+      // Fallback for local testing if needed
+      setCurrentTurnIndex(prev => prev + 1);
     }
-
-    setClues(prev => [...prev, { id: Date.now(), playerId: myPlayerId, text: humanInput }]);
-    setHumanInput('');
-    setCurrentTurnIndex(prev => prev + 1);
-  };
-
-  const handleSpeakNow = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Your browser does not support Speech Recognition.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => setIsListening(true);
-    
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setHumanInput(transcript);
-    };
-    
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
-      setIsListening(false);
-    };
-    
-    recognition.onend = () => setIsListening(false);
-
-    recognition.start();
   };
 
   const activePlayerId = turnOrder[currentTurnIndex];
@@ -120,11 +81,13 @@ export default function ClueGiving({ players, secretWord, spyId, onFinish, round
             <div className="clue-avatar-grid">
               {players.map((p) => {
                 const isActive = p.id === activePlayerId;
-                const hasGivenClue = clues.some(c => c.playerId === p.id);
+                // Check if this player has already taken their turn
+                const pTurnIndex = turnOrder.indexOf(p.id);
+                const hasFinishedTurn = pTurnIndex > -1 && pTurnIndex < currentTurnIndex;
                 
                 return (
                   <div key={p.id} className="avatar-wrapper">
-                    <div className={`avatar-circle ${isActive ? 'avatar-active' : ''} ${hasGivenClue && !isActive ? 'avatar-done' : ''}`}>
+                    <div className={`avatar-circle ${isActive ? 'avatar-active' : ''} ${hasFinishedTurn ? 'avatar-done' : ''}`}>
                       <img src={p.avatar} alt={p.name} />
                     </div>
                     <span className="avatar-name">{p.name}</span>
@@ -135,57 +98,41 @@ export default function ClueGiving({ players, secretWord, spyId, onFinish, round
           </div>
 
           <div className="clues-so-far-container">
-            <h3 className="clues-so-far-title">Clues So Far</h3>
-            <div className="clues-list">
-              {clues.slice((turnOrder.length > 0 && currentTurnIndex < turnOrder.length && !isHumanTurn) ? -2 : -3).map((c) => {
-                const player = players.find(p => p.id === c.playerId);
-                return (
-                  <div key={c.id} className="clue-item fade-in">
-                    <img src={player?.avatar} alt={player?.name} className="clue-item-avatar" />
-                    <div className="clue-item-content">
-                      <span className="clue-item-name">{player?.name}</span> 
-                      <span className="clue-item-text">"{c.text}"</span>
-                    </div>
-                  </div>
-                );
-              })}
-              {turnOrder.length > 0 && currentTurnIndex < turnOrder.length && !isHumanTurn && (
-                <div className="clue-item fade-in" style={{ opacity: 0.6 }}>
-                  <img src={players.find(p => p.id === activePlayerId)?.avatar} className="clue-item-avatar" />
-                  <div className="clue-item-content">
-                    <span className="clue-item-name">{players.find(p => p.id === activePlayerId)?.name}</span>
-                    <span className="clue-item-text">is typing...</span>
-                  </div>
-                </div>
+            <h3 className="clues-so-far-title">Live Voice Discussion</h3>
+            <div className="clues-list" style={{ textAlign: 'center', color: 'rgba(255,255,255,0.7)', marginTop: '20px' }}>
+              {currentTurnIndex >= turnOrder.length ? (
+                <p>All clues given! Proceeding to voting...</p>
+              ) : (
+                <p>
+                  {isHumanTurn 
+                    ? "Speak your clue to the group using your microphone." 
+                    : `${players.find(p => p.id === activePlayerId)?.name} is speaking... Listen carefully!`}
+                </p>
               )}
-              <div ref={cluesEndRef} />
             </div>
             
-            <form className="clue-input-area" onSubmit={handleHumanSubmit}>
-              <div className="clue-input-wrapper">
-                <input 
-                  type="text" 
-                  className="clue-input" 
-                  placeholder="Say about the word" 
-                  value={humanInput}
-                  onChange={(e) => setHumanInput(e.target.value)}
-                  disabled={!isHumanTurn}
-                />
-                <button type="submit" className="clue-send-btn" disabled={!isHumanTurn || !humanInput.trim()}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-              </div>
+            <div className="clue-input-area" style={{ justifyContent: 'center' }}>
               <button 
                 type="button" 
-                className={`clue-speak-btn ${isHumanTurn && !isListening ? 'pulse-pop' : ''}`} 
-                disabled={!isHumanTurn || isListening}
-                onClick={handleSpeakNow}
-                style={{ background: isListening ? '#ef4444' : '#7c3aed' }}
+                className={`clue-speak-btn ${isHumanTurn ? 'pulse-pop' : ''}`} 
+                disabled={!isHumanTurn}
+                onClick={handleEndTurn}
+                style={{ 
+                  background: isHumanTurn ? '#7c3aed' : '#4b5563', 
+                  width: '100%', 
+                  padding: '15px', 
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  fontSize: '16px',
+                  color: 'white',
+                  cursor: isHumanTurn ? 'pointer' : 'not-allowed',
+                  border: 'none',
+                  marginTop: '20px'
+                }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-                {isListening ? "Listening..." : "Speak now"}
+                {isHumanTurn ? "Finish My Turn" : "Waiting for turn..."}
               </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
