@@ -41,7 +41,17 @@ export default function VoiceChat({ roomId, participantName }) {
   }
 
   return (
-    <div style={{ marginTop: '15px' }}>
+    <div style={{ 
+      position: 'absolute', 
+      bottom: '10px', 
+      left: '0',
+      right: '0',
+      zIndex: 9999,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      pointerEvents: 'none' // allow clicking through empty space
+    }}>
       <LiveKitRoom
         serverUrl={import.meta.env.VITE_LIVEKIT_URL || 'wss://placeholder-url.livekit.cloud'}
         token={token}
@@ -50,10 +60,12 @@ export default function VoiceChat({ roomId, participantName }) {
         video={false}
       >
         <RoomAudioRenderer />
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px', pointerEvents: 'auto' }}>
           <ControlBar controls={{ camera: false, screenShare: false, chat: false, leave: false }} />
         </div>
-        <VoiceParticipants />
+        <div style={{ pointerEvents: 'auto' }}>
+          <VoiceParticipants />
+        </div>
       </LiveKitRoom>
     </div>
   );
