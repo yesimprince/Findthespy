@@ -3,8 +3,8 @@ import { SERVER_URL } from '../services/socket';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
-  ControlBar,
-  useParticipants
+  useParticipants,
+  useLocalParticipant
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 
@@ -60,15 +60,37 @@ export default function VoiceChat({ roomId, participantName }) {
         video={false}
       >
         <RoomAudioRenderer />
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px', pointerEvents: 'auto' }}>
-          <ControlBar controls={{ camera: false, screenShare: false, chat: false, leave: false }} />
-        </div>
+        <MicController />
         <div style={{ pointerEvents: 'auto' }}>
           <VoiceParticipants />
         </div>
       </LiveKitRoom>
     </div>
   );
+}
+
+function MicController() {
+  const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
+  
+  useEffect(() => {
+    if (!localParticipant) return;
+    
+    // Broadcast state
+    window.dispatchEvent(new CustomEvent('mic-state-changed', { detail: isMicrophoneEnabled }));
+  }, [localParticipant, isMicrophoneEnabled]);
+
+  useEffect(() => {
+    if (!localParticipant) return;
+
+    const handleToggle = () => {
+      localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+    };
+
+    window.addEventListener('toggle-mic', handleToggle);
+    return () => window.removeEventListener('toggle-mic', handleToggle);
+  }, [localParticipant, isMicrophoneEnabled]);
+
+  return null;
 }
 
 function VoiceParticipants() {
