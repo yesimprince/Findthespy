@@ -14,7 +14,7 @@ import ModeSelection from './screens/ModeSelection'
 import Lobby from './screens/Lobby'
 import JoinRoom from './screens/JoinRoom'
 import VoiceChat from './components/VoiceChat'
-import { BOTS, WORD_MAP, shuffleArray } from './gameData'
+import { WORD_MAP, shuffleArray } from './gameData'
 import { socket } from './services/socket'
 import { useEffect } from 'react'
 
@@ -113,16 +113,7 @@ function App() {
     });
   };
 
-  const startNewGame = () => {
-    const human = { id: 'human', name: 'You', avatar: 'https://ui-avatars.com/api/?name=You&background=00ffcc&color=fff', score: 0, isHuman: true };
-    const botPlayers = BOTS.map(b => ({ ...b, score: 0, isHuman: false }));
-    const initialPlayers = [human, ...botPlayers];
-    setPlayers(initialPlayers);
-    setCurrentRound(1);
-    setUsedWords([]);
-    
-    startRound(1, initialPlayers, []);
-  };
+
 
   const startRound = (roundNum, currentPlayers, currentUsedWords) => {
     // Pick word
@@ -201,7 +192,7 @@ function App() {
     setGameState('ROUND_RESULTS');
   };
 
-  const isHumanSpy = spyId === 'human';
+  const isHumanSpy = spyId === myPlayerId;
 
   return (
     <div className="app-container">
@@ -228,7 +219,6 @@ function App() {
       
       {gameState === 'MODE_SELECTION' && (
         <ModeSelection 
-          onPlayBots={startNewGame}
           onPlayFriends={startLobby}
           onJoinRoom={() => setGameState('JOIN_ROOM')}
           onBack={() => setGameState('SPLASH')}
@@ -309,6 +299,7 @@ function App() {
           secretWord={secretWord}
           spyId={spyId}
           roundNumber={currentRound}
+          myPlayerId={myPlayerId}
           onFinish={(clues) => {
             setCluesGiven(clues);
             setGameState('VOTING');
@@ -320,6 +311,7 @@ function App() {
         <Voting 
           players={players}
           spyId={spyId}
+          myPlayerId={myPlayerId}
           onFinish={handleVotesFinished}
         />
       )}
@@ -331,6 +323,7 @@ function App() {
           secretWord={secretWord}
           scores={players}
           roundNumber={currentRound}
+          myPlayerId={myPlayerId}
           onNextRound={nextRoundOrEnd}
         />
       )}
@@ -338,6 +331,7 @@ function App() {
       {gameState === 'LEADERBOARD' && (
         <Leaderboard 
           players={players}
+          myPlayerId={myPlayerId}
           onBack={() => setGameState('SPLASH')} 
         />
       )}

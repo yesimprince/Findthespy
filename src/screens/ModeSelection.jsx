@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './ModeSelection.css';
 import splashBg from '../assets/splash-bg.png';
 
-export default function ModeSelection({ onPlayBots, onPlayFriends, onJoinRoom, onBack }) {
+export default function ModeSelection({ onPlayFriends, onJoinRoom, onBack }) {
   const [showPopup, setShowPopup] = useState(false);
   const [roomName, setRoomName] = useState('');
 
@@ -23,9 +23,7 @@ export default function ModeSelection({ onPlayBots, onPlayFriends, onJoinRoom, o
         <h2 className="mode-title">Choose Game Mode</h2>
         
         <div className="action-buttons mode-actions">
-          <button className="btn-primary" onClick={onPlayBots}>
-            Let's start game
-          </button>
+
           <button className="btn-primary friends-btn" onClick={() => setShowPopup(true)}>
             Create a room
           </button>

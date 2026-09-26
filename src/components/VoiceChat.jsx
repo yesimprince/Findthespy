@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { SERVER_URL } from '../services/socket';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -12,7 +13,7 @@ export default function VoiceChat({ roomId, participantName }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/voice-token', {
+    fetch(`${SERVER_URL}/api/voice-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomName: roomId, participantName })

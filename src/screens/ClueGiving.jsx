@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ClueGiving.css';
 import bgImage from '../assets/how-to-play-bg.png';
-import { WORD_MAP, SPY_FALLBACK_CLUES, shuffleArray } from '../gameData';
+import { shuffleArray } from '../gameData';
 
-export default function ClueGiving({ players, secretWord, spyId, onFinish, roundNumber }) {
+export default function ClueGiving({ players, secretWord, spyId, onFinish, roundNumber, myPlayerId }) {
   const [timeLeft, setTimeLeft] = useState(90);
   const [clues, setClues] = useState([]); 
   const [turnOrder, setTurnOrder] = useState([]);
@@ -35,45 +35,6 @@ export default function ClueGiving({ players, secretWord, spyId, onFinish, round
     }
   }, [timeLeft, currentTurnIndex, turnOrder, onFinish, clues]);
 
-  // Bot Turn Logic
-  useEffect(() => {
-    if (turnOrder.length === 0) return;
-    if (currentTurnIndex >= turnOrder.length) return;
-
-    const currentPlayerId = turnOrder[currentTurnIndex];
-    
-    if (currentPlayerId !== 'human') {
-      const delay = Math.floor(Math.random() * 2000) + 2000; 
-      const botTimer = setTimeout(() => {
-        let clueText = '';
-        if (currentPlayerId === spyId) {
-          const availableGeneric = SPY_FALLBACK_CLUES.filter(c => !clues.map(cl => cl.text).includes(c));
-          clueText = availableGeneric.length > 0 
-            ? availableGeneric[Math.floor(Math.random() * availableGeneric.length)]
-            : "I agree with what's been said.";
-        } else {
-          const possibleClues = WORD_MAP[secretWord] || [];
-          const availableClues = possibleClues.filter(c => !clues.map(cl => cl.text).includes(c));
-          clueText = availableClues.length > 0
-            ? availableClues[Math.floor(Math.random() * availableClues.length)]
-            : "It's related to the word.";
-        }
-
-        setClues(prev => [...prev, { id: Date.now(), playerId: currentPlayerId, text: clueText }]);
-        setCurrentTurnIndex(prev => prev + 1);
-
-        // Text-to-Speech for Bots
-        if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(clueText);
-          utterance.rate = 0.9 + Math.random() * 0.2; 
-          utterance.pitch = 0.8 + Math.random() * 0.4;
-          window.speechSynthesis.speak(utterance);
-        }
-      }, delay);
-      
-      return () => clearTimeout(botTimer);
-    }
-  }, [currentTurnIndex, turnOrder, secretWord, spyId, clues]);
 
   useEffect(() => {
     cluesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -88,7 +49,7 @@ export default function ClueGiving({ players, secretWord, spyId, onFinish, round
       return;
     }
 
-    setClues(prev => [...prev, { id: Date.now(), playerId: 'human', text: humanInput }]);
+    setClues(prev => [...prev, { id: Date.now(), playerId: myPlayerId, text: humanInput }]);
     setHumanInput('');
     setCurrentTurnIndex(prev => prev + 1);
   };
@@ -123,7 +84,7 @@ export default function ClueGiving({ players, secretWord, spyId, onFinish, round
   };
 
   const activePlayerId = turnOrder[currentTurnIndex];
-  const isHumanTurn = activePlayerId === 'human';
+  const isHumanTurn = activePlayerId === myPlayerId;
 
   const formatTime = (time) => {
     const mins = Math.floor(time / 60);
@@ -152,7 +113,9 @@ export default function ClueGiving({ players, secretWord, spyId, onFinish, round
         <div className="clue-main-card">
           <div className="clue-turn-section">
             <h2 className="clue-turn-title">
-              {isHumanTurn ? "YOUR TURN" : `${players.find(p => p.id === activePlayerId)?.name?.toUpperCase()}'S TURN`}
+              {currentTurnIndex >= turnOrder.length 
+                ? "ROUND OVER" 
+                : (isHumanTurn ? "YOUR TURN" : `${players.find(p => p.id === activePlayerId)?.name?.toUpperCase()}'S TURN`)}
             </h2>
             <div className="clue-avatar-grid">
               {players.map((p) => {

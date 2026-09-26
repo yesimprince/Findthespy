@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './RoundResults.css';
 import bgImage from '../assets/how-to-play-bg.png';
 
-export default function RoundResults({ onNextRound, outcome, spyPlayer, secretWord, scores, roundNumber }) {
+export default function RoundResults({ onNextRound, outcome, spyPlayer, secretWord, scores, roundNumber, myPlayerId }) {
   const [timeLeft, setTimeLeft] = useState(5);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function RoundResults({ onNextRound, outcome, spyPlayer, secretWo
                   <div className="score-left">
                     <span className="score-rank">{idx + 1}</span>
                     <img src={s.avatar} alt={s.name} className="score-avatar" />
-                    <span className="score-name">{s.name} {s.id === 'human' && '(You)'}</span>
+                    <span className="score-name">{s.name} {s.id === myPlayerId && '(You)'}</span>
                   </div>
                   <div className="score-right">
                     <span className="score-trophy">🏆</span>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Voting.css';
 import bgImage from '../assets/how-to-play-bg.png';
 
-export default function Voting({ players, spyId, onFinish }) {
+export default function Voting({ players, spyId, onFinish, myPlayerId }) {
   const [timeLeft, setTimeLeft] = useState(10);
   const [votes, setVotes] = useState({}); 
   const [humanLocked, setHumanLocked] = useState(false);
@@ -16,43 +16,12 @@ export default function Voting({ players, spyId, onFinish }) {
     }
   }, [timeLeft, onFinish, votes]);
 
-  useEffect(() => {
-    const bots = players.filter(p => !p.isHuman);
-    
-    bots.forEach(bot => {
-      if (!votes[bot.id]) {
-        const delay = Math.floor(Math.random() * 8000) + 1000; 
-        const timer = setTimeout(() => {
-          setVotes(prev => {
-            if (prev[bot.id]) return prev; 
-            
-            let targetId;
-            const validTargets = players.filter(p => p.id !== bot.id);
-            
-            if (bot.id === spyId) {
-              targetId = validTargets[Math.floor(Math.random() * validTargets.length)].id;
-            } else {
-              if (Math.random() < 0.7) {
-                targetId = spyId;
-              } else {
-                const nonSpies = validTargets.filter(p => p.id !== spyId);
-                targetId = nonSpies[Math.floor(Math.random() * nonSpies.length)].id;
-              }
-            }
-            
-            return { ...prev, [bot.id]: targetId };
-          });
-        }, delay);
-        return () => clearTimeout(timer); 
-      }
-    });
-  }, [players, spyId]); 
 
   const handleHumanVote = (targetId) => {
     if (humanLocked) return;
-    if (targetId === 'human') return; 
+    if (targetId === myPlayerId) return; 
     
-    setVotes(prev => ({ ...prev, ['human']: targetId }));
+    setVotes(prev => ({ ...prev, [myPlayerId]: targetId }));
     setHumanLocked(true);
   };
 
@@ -82,9 +51,9 @@ export default function Voting({ players, spyId, onFinish }) {
           
           <div className="voting-list">
             {players.map((p, index) => {
-              const isTarget = votes['human'] === p.id;
+              const isTarget = votes[myPlayerId] === p.id;
               const vCount = voteCounts[p.id] || 0;
-              const isSelf = p.id === 'human';
+              const isSelf = p.id === myPlayerId;
 
               return (
                 <button 

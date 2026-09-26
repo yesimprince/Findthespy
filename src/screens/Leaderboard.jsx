@@ -1,7 +1,7 @@
 import React from 'react';
 import './Leaderboard.css';
 
-export default function Leaderboard({ players, onBack }) {
+export default function Leaderboard({ players, onBack, myPlayerId }) {
   
   const sorted = [...players].sort((a, b) => b.score - a.score);
   
@@ -26,7 +26,7 @@ export default function Leaderboard({ players, onBack }) {
               <span className="podium-badge badge-silver">2</span>
               <img src={second.avatar} alt={second.name} className="podium-avatar" />
             </div>
-            <span className="podium-name">{second.name}</span>
+            <span className="podium-name">{second.name} {second.id === myPlayerId && '(You)'}</span>
             <span className="podium-score">{second.score}</span>
             <div className="podium-block block-2">2<sup>nd</sup></div>
           </div>
@@ -39,7 +39,7 @@ export default function Leaderboard({ players, onBack }) {
               <span className="podium-badge badge-gold">1</span>
               <img src={first.avatar} alt={first.name} className="podium-avatar avatar-large" />
             </div>
-            <span className="podium-name">{first.name}</span>
+            <span className="podium-name">{first.name} {first.id === myPlayerId && '(You)'}</span>
             <span className="podium-score">{first.score}</span>
             <div className="podium-block block-1">1<sup>st</sup></div>
           </div>
@@ -51,7 +51,7 @@ export default function Leaderboard({ players, onBack }) {
               <span className="podium-badge badge-bronze">3</span>
               <img src={third.avatar} alt={third.name} className="podium-avatar" />
             </div>
-            <span className="podium-name">{third.name}</span>
+            <span className="podium-name">{third.name} {third.id === myPlayerId && '(You)'}</span>
             <span className="podium-score">{third.score}</span>
             <div className="podium-block block-3">3<sup>rd</sup></div>
           </div>
@@ -60,11 +60,11 @@ export default function Leaderboard({ players, onBack }) {
 
       <div className="leaderboard-list-container">
         {others.map((p, index) => (
-          <div key={p.id} className={`leaderboard-list-item ${p.id === 'human' ? 'is-you' : ''}`}>
+          <div key={p.id} className={`leaderboard-list-item ${p.id === myPlayerId ? 'is-you' : ''}`}>
             <div className="list-item-left">
               <span className="list-rank">{index + 4}</span>
               <img src={p.avatar} alt={p.name} className="list-avatar" />
-              <span className="list-name">{p.name} {p.id === 'human' && '(You)'}</span>
+              <span className="list-name">{p.name} {p.id === myPlayerId && '(You)'}</span>
             </div>
             <div className="list-item-right">
               <span className="list-trophy">🏆</span>

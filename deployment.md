@@ -30,7 +30,7 @@
 | Component | Platform | Free Tier | Why |
 |-----------|----------|-----------|-----|
 | **Frontend** | **Vercel** | Unlimited deploys, auto-HTTPS | Built for Vite/React, instant deploys from GitHub |
-| **Backend** | **Railway** | $5 free trial credit | Native WebSocket support for Socket.io |
+| **Backend** | **Render** | Free tier (sleeps after 15m) | Native WebSocket support for Socket.io |
 | **Database** | **Neon** (already set up!) | 0.5 GB free | Already configured with Prisma |
 | **Voice Chat** | **LiveKit Cloud** (already set up!) | 50 GB/month free | Already configured |
 | **Domain** | Optional | — | Use `.vercel.app` + `.up.railway.app` for free |
@@ -79,43 +79,38 @@ git push -u origin main
 
 ---
 
-## Step 2: Deploy the Backend on Railway
+## Step 2: Deploy the Backend on Render
 
-### 2a. Sign Up & Create Project
-1. Go to [railway.app](https://railway.app) → Sign in with GitHub
-2. Click **"New Project"** → **"Deploy from GitHub Repo"**
-3. Select your `find-my-spy` repo
+Render is an excellent alternative that offers a permanent free tier for Web Services (though it will "sleep" after 15 mins of inactivity and take ~30 seconds to wake up on the first request).
 
-### 2b. Configure Root Directory
-Railway needs to know the backend lives in `/server`:
-- Go to **Settings** → **Root Directory** → set to `server`
+### 2a. Sign Up & Create Web Service
+1. Go to [render.com](https://render.com) → Sign in with GitHub
+2. Click **"New +"** → **"Web Service"**
+3. Select **"Build and deploy from a Git repository"** and choose your `find-my-spy` repo.
+
+### 2b. Configure the Web Service
+Fill in these details:
+- **Name:** `find-my-spy-server`
+- **Root Directory:** `server`
+- **Environment:** `Node`
+- **Build Command:** `npm install && npx prisma generate`
+- **Start Command:** `npm start`
+- **Instance Type:** Free
 
 ### 2c. Set Environment Variables
-In your Railway project dashboard, go to **Variables** and add:
+Scroll down to **Environment Variables** and add:
 
 ```env
 DATABASE_URL=postgresql://neondb_owner:...@ep-fancy-fog-....neon.tech/neondb?sslmode=require
 LIVEKIT_URL=wss://findthespy-cwhi6g13.livekit.cloud
 LIVEKIT_API_KEY=API7AUBMAh6A85V
 LIVEKIT_API_SECRET=<your-secret-here>
-PORT=3000
 ```
 
-### 2d. Add Build Command
-In **Settings** → **Build Command**:
-```bash
-npm install && npx prisma generate
+### 2d. Get Your Backend URL
+Click **"Create Web Service"**. Once the build finishes, Render will give you a URL like:
 ```
-
-**Start Command**:
-```bash
-npm start
-```
-
-### 2e. Get Your Backend URL
-Once deployed, Railway gives you a URL like:
-```
-https://find-my-spy-server-production.up.railway.app
+https://find-my-spy-server.onrender.com
 ```
 
 **Save this URL** — you'll need it for the frontend.
@@ -146,7 +141,7 @@ VITE_SERVER_URL=http://localhost:3001
 
 ### Create a `.env.production` file for the deployed version:
 ```env
-VITE_SERVER_URL=https://find-my-spy-server-production.up.railway.app
+VITE_SERVER_URL=https://find-my-spy-server.onrender.com
 ```
 
 > Vite automatically uses `.env.production` when you run `npm run build`.
@@ -186,7 +181,7 @@ Click **Deploy**. Vercel will:
 
 ## Step 5: Update CORS on the Backend
 
-Your Railway backend needs to allow requests from your Vercel domain.
+Your Render backend needs to allow requests from your Vercel domain.
 
 ### Edit `server/index.js`:
 
@@ -212,7 +207,7 @@ app.use(cors({
 }));
 ```
 
-Commit, push, and Railway will auto-redeploy.
+Commit, push, and Render will auto-redeploy.
 
 ---
 
@@ -223,10 +218,10 @@ Commit, push, and Railway will auto-redeploy.
 2. Add your domain: `findmyspy.com`
 3. Update your domain's DNS to point to Vercel
 
-### On Railway (Backend):
-1. Go to **Settings** → **Networking** → **Custom Domain**
+### On Render (Backend):
+1. Go to **Settings** → **Custom Domains**
 2. Add: `api.findmyspy.com`
-3. Update DNS with the CNAME Railway provides
+3. Update DNS with the CNAME Render provides
 
 ### Update Socket URL:
 ```env
@@ -237,14 +232,14 @@ VITE_SERVER_URL=https://api.findmyspy.com
 
 ## 🔄 CI/CD (Automatic Deployments)
 
-Both Vercel and Railway support **auto-deploy on push**:
+Both Vercel and Render support **auto-deploy on push**:
 
 ```
 git push origin main
       │
       ├──► Vercel detects change → rebuilds frontend → live in ~30s
       │
-      └──► Railway detects change → rebuilds backend → live in ~60s
+      └──► Render detects change → rebuilds backend → live in ~2m
 ```
 
 No manual steps needed after initial setup!
@@ -269,7 +264,7 @@ After deploying, verify everything works:
 | Service | Free Tier Limit | Paid Tier |
 |---------|-----------------|-----------|
 | **Vercel** | 100 GB bandwidth/month | $20/mo (Pro) |
-| **Railway** | $5 trial credit, then $5/mo | Usage-based |
+| **Render** | Free forever (sleeps after 15m) | $7/mo |
 | **Neon** | 0.5 GB storage, 100 hrs compute | $19/mo (Launch) |
 | **LiveKit** | 50 GB bandwidth/month | Usage-based |
 
@@ -282,11 +277,11 @@ After deploying, verify everything works:
 | Issue | Cause | Fix |
 |-------|-------|-----|
 | WebSocket connection fails | CORS not configured | Add Vercel domain to `cors.origin` in `server/index.js` |
-| `prisma: command not found` | Missing build step | Set Railway build command to `npm install && npx prisma generate` |
-| Voice chat not connecting | LiveKit env vars missing | Double-check Railway environment variables |
+| `prisma: command not found` | Missing build step | Set Render build command to `npm install && npx prisma generate` |
+| Voice chat not connecting | LiveKit env vars missing | Double-check Render environment variables |
 | Frontend shows blank page | Wrong build output dir | Ensure Vercel output is set to `dist` |
-| Socket connects then drops | Railway idle timeout | Upgrade to paid tier or add keep-alive ping |
-| `Mixed Content` error | HTTP backend + HTTPS frontend | Railway auto-provides HTTPS — ensure URL uses `https://` |
+| Socket connects then drops | Render idle timeout | Upgrade to paid tier or accept 30s wake-up time |
+| `Mixed Content` error | HTTP backend + HTTPS frontend | Render auto-provides HTTPS — ensure URL uses `https://` |
 
 ---
 
@@ -296,7 +291,7 @@ After deploying, verify everything works:
 find-my-spy/
 ├── .gitignore              # Excludes node_modules, .env, dist
 ├── .env                    # Local dev (VITE_SERVER_URL=http://localhost:3001)
-├── .env.production         # Production (VITE_SERVER_URL=https://your-railway-url)
+├── .env.production         # Production (VITE_SERVER_URL=https://your-render-url)
 ├── package.json            # Frontend deps
 ├── vite.config.js
 ├── index.html
@@ -305,8 +300,8 @@ find-my-spy/
 │   ├── services/socket.js  # Updated with env-based URL
 │   └── ...
 │
-└── server/                 # Deployed separately on Railway
-    ├── .env                # NOT committed — set in Railway dashboard
+└── server/                 # Deployed separately on Render
+    ├── .env                # NOT committed — set in Render dashboard
     ├── package.json
     ├── index.js
     └── prisma/
@@ -318,9 +313,9 @@ find-my-spy/
 ## ✅ Deployment Checklist
 
 - [ ] Code pushed to GitHub
-- [ ] Backend deployed on Railway with env vars
+- [ ] Backend deployed on Render with env vars
 - [ ] `src/services/socket.js` updated to use `VITE_SERVER_URL`
-- [ ] `.env.production` created with Railway URL
+- [ ] `.env.production` created with Render URL
 - [ ] Frontend deployed on Vercel with `VITE_SERVER_URL` env var
 - [ ] CORS updated in `server/index.js` with Vercel domain
 - [ ] Tested: room creation, joining, game start, voice chat, disconnect
